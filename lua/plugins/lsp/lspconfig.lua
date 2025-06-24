@@ -49,7 +49,7 @@ return {
 				keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts) -- smart rename
 
 				opts.desc = "Show buffer diagnostics"
-				keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts) -- show  diagnostics for file
+				keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts) -- show diagnostics for file
 
 				opts.desc = "Show line diagnostics"
 				keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts) -- show diagnostics for line
@@ -79,42 +79,63 @@ return {
 		end
 
 		mason_lspconfig.setup({
-			-- default handler for installed servers
-			function(server_name)
-				lspconfig[server_name].setup({
-					capabilities = capabilities,
-				})
-			end,
-			["lua_ls"] = function()
-				-- configure lua server (with special settings)
-				lspconfig["lua_ls"].setup({
-					capabilities = capabilities,
-					settings = {
-						Lua = {
-							-- make the language server recognize "vim" global
-							diagnostics = {
-								globals = { "vim" },
-							},
-							completion = {
-								callSnippet = "Replace",
+			-- Ensure mason installs the servers you need
+			ensure_installed = { "lua_ls", "pyright" },
+
+			handlers = {
+				-- Default handler for servers not explicitly listed
+				-- This will apply to any server installed by mason that doesn't have a specific handler below
+				["_"] = function(server_name)
+					lspconfig[server_name].setup({
+						capabilities = capabilities,
+					})
+				end,
+
+				-- Specific configuration for lua_ls
+				["lua_ls"] = function()
+					lspconfig["lua_ls"].setup({
+						capabilities = capabilities,
+						settings = {
+							Lua = {
+								-- make the language server recognize "vim" global
+								diagnostics = {
+									globals = { "vim" },
+								},
+								completion = {
+									callSnippet = "Replace",
+								},
+								-- Add runtime path for Neovim's Lua files
+								-- This helps lua_ls find standard Neovim functions
+								runtime = {
+									version = "LuaJIT",
+									path = vim.split(package.path, ";"),
+								},
+								workspace = {
+									-- Make the server aware of Neovim runtime files
+									library = {
+										[vim.fn.expand("$VIMRUNTIME/lua")] = true,
+										[vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
+									},
+								},
 							},
 						},
-					},
-				})
-			end,
-			-- Specific configuration for pyright
-			["pyright"] = function()
-				lspconfig["pyright"].setup({
-					capabilities = capabilities,
-					settings = {
-						python = {
-							analysis = {
-								typeCheckingMode = "basic", -- or "strict" depending on preference
+					})
+				end,
+
+				-- Specific configuration for pyright
+				["pyright"] = function()
+					lspconfig["pyright"].setup({
+						capabilities = capabilities,
+						settings = {
+							python = {
+								analysis = {
+									typeCheckingMode = "basic", -- or "strict" depending on preference
+								},
 							},
 						},
-					},
-				})
-			end,
+					})
+				end,
+			},
 		})
 	end,
 }
