@@ -36,7 +36,10 @@ vim.keymap.set("v", "p", '"_dP', opts)
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
 vim.keymap.set("n", "<leader>Y", [["+Y]])
 
--- -- Terminal buffer commands
+-- Terminal buffer commands
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", opts) -- exit input mode in terminal buffer
 vim.keymap.set("n", "<leader>tf", ":ToggleTerm direction=float<CR>", opts) -- toggle floating terminal
 vim.keymap.set("n", "<leader>tv", ":ToggleTerm direction=vertical<CR>", opts) -- toggle vertical terminal
+
+-- Temp Commands for BQ Admin Monotony
+vim.keymap.set("n", "<leader>rp", [[<cmd>%s/^- \(.*\)\s*#.*$/"\1",/g<CR>]], opts)
