@@ -22,6 +22,6 @@ require("lazy").setup({
     { import = "plugins" },
     {import = 'plugins.lsp'},
   },
-  -- automatically check for plugin updates
-  checker = { enabled = true },
+  -- check for plugin updates once a day, quietly (see :Lazy for pending updates)
+  checker = { enabled = true, notify = false, frequency = 86400 },
 })
