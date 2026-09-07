@@ -1,99 +1,121 @@
 -- Highlight, edit, and navigate code
+local languages = {
+	"lua",
+	"python",
+	"vimdoc",
+	"vim",
+	"regex",
+	"terraform",
+	"sql",
+	"dockerfile",
+	"toml",
+	"json",
+	"gitignore",
+	"yaml",
+	"make",
+	"cmake",
+	"markdown",
+	"markdown_inline",
+	"bash",
+	"tsx",
+}
+
 return {
 	"nvim-treesitter/nvim-treesitter",
-	branch = "master",
+	branch = "main",
 	build = ":TSUpdate",
 	lazy = false,
 	priority = 1000,
+
 	dependencies = {
-		"nvim-treesitter/nvim-treesitter-textobjects",
+		{
+			"nvim-treesitter/nvim-treesitter-textobjects",
+			branch = "main",
+		},
 	},
+
 	config = function()
-		require("nvim-treesitter.configs").setup({
-			-- Add languages to be installed here that you want installed for treesitter
-			ensure_installed = {
-				"lua",
-				"python",
-				"vimdoc",
-				"vim",
-				"regex",
-				"terraform",
-				"sql",
-				"dockerfile",
-				"toml",
-				"json",
-				"gitignore",
-				"yaml",
-				"make",
-				"cmake",
-				"markdown",
-				"markdown_inline",
-				"bash",
-				"tsx",
-			},
+		local treesitter = require("nvim-treesitter")
 
-			-- Autoinstall languages that are not installed
-			auto_install = true,
+		treesitter.setup()
 
-			highlight = { enable = true },
-			indent = { enable = true },
-			incremental_selection = {
-				enable = true,
-				keymaps = {
-					init_selection = "<c-space>",
-					node_incremental = "<c-space>",
-					scope_incremental = "<c-s>",
-					node_decremental = "<M-space>",
-				},
+		-- Installs missing parsers asynchronously.
+		-- This is a no-op for parsers that are already installed.
+		treesitter.install(languages)
+
+		-- Enable highlighting and indentation whenever a parser exists.
+		vim.api.nvim_create_autocmd("FileType", {
+			group = vim.api.nvim_create_augroup("treesitter-start", { clear = true }),
+			callback = function(args)
+				local ok = pcall(vim.treesitter.start, args.buf)
+
+				if ok then
+					vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+				end
+			end,
+		})
+
+		-- Incremental selection is now built into Neovim.
+		vim.keymap.set({ "n", "x" }, "<C-Space>", function()
+			vim.treesitter.select("parent")
+		end, { desc = "Select parent syntax node" })
+
+		vim.keymap.set("x", "<M-Space>", function()
+			vim.treesitter.select("child")
+		end, { desc = "Select child syntax node" })
+
+		-- Text-object configuration
+		require("nvim-treesitter-textobjects").setup({
+			select = {
+				lookahead = true,
 			},
-			textobjects = {
-				select = {
-					enable = true,
-					lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-					keymaps = {
-						-- You can use the capture groups defined in textobjects.scm
-						["aa"] = "@parameter.outer",
-						["ia"] = "@parameter.inner",
-						["af"] = "@function.outer",
-						["if"] = "@function.inner",
-						["ac"] = "@class.outer",
-						["ic"] = "@class.inner",
-					},
-				},
-				move = {
-					enable = true,
-					set_jumps = true, -- whether to set jumps in the jumplist
-					goto_next_start = {
-						["]m"] = "@function.outer",
-						["]]"] = "@class.outer",
-					},
-					goto_next_end = {
-						["]M"] = "@function.outer",
-						["]["] = "@class.outer",
-					},
-					goto_previous_start = {
-						["[m"] = "@function.outer",
-						["[["] = "@class.outer",
-					},
-					goto_previous_end = {
-						["[M"] = "@function.outer",
-						["[]"] = "@class.outer",
-					},
-				},
-				swap = {
-					enable = true,
-					swap_next = {
-						["<leader>a"] = "@parameter.inner",
-					},
-					swap_previous = {
-						["<leader>A"] = "@parameter.inner",
-					},
-				},
+			move = {
+				set_jumps = true,
 			},
 		})
 
-		-- Register additional file extensions
-		vim.filetype.add({ extension = { tf = "terraform" } })
-		vim.filetype.add({ extension = { tfvars = "terraform" } })
+		local function map_select(lhs, capture)
+			vim.keymap.set({ "x", "o" }, lhs, function()
+				require("nvim-treesitter-textobjects.select").select_textobject(capture, "textobjects")
+			end)
+		end
+
+		map_select("aa", "@parameter.outer")
+		map_select("ia", "@parameter.inner")
+		map_select("af", "@function.outer")
+		map_select("if", "@function.inner")
+		map_select("ac", "@class.outer")
+		map_select("ic", "@class.inner")
+
+		local function map_move(lhs, method, capture)
+			vim.keymap.set({ "n", "x", "o" }, lhs, function()
+				require("nvim-treesitter-textobjects.move")[method](capture, "textobjects")
+			end)
+		end
+
+		map_move("]m", "goto_next_start", "@function.outer")
+		map_move("]]", "goto_next_start", "@class.outer")
+		map_move("]M", "goto_next_end", "@function.outer")
+		map_move("][", "goto_next_end", "@class.outer")
+
+		map_move("[m", "goto_previous_start", "@function.outer")
+		map_move("[[", "goto_previous_start", "@class.outer")
+		map_move("[M", "goto_previous_end", "@function.outer")
+		map_move("[]", "goto_previous_end", "@class.outer")
+
+		vim.keymap.set("n", "<leader>a", function()
+			require("nvim-treesitter-textobjects.swap").swap_next("@parameter.inner")
+		end, { desc = "Swap with next parameter" })
+
+		vim.keymap.set("n", "<leader>A", function()
+			require("nvim-treesitter-textobjects.swap").swap_previous("@parameter.inner")
+		end, { desc = "Swap with previous parameter" })
+
+		vim.filetype.add({
+			extension = {
+				tf = "terraform",
+				tfvars = "terraform",
+			},
+		})
 	end,
 }

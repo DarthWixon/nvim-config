@@ -40,18 +40,3 @@ vim.keymap.set("n", "<leader>Y", [["+Y]])
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", opts) -- exit input mode in terminal buffer
 vim.keymap.set("n", "<leader>tf", ":ToggleTerm direction=float<CR>", opts) -- toggle floating terminal
 vim.keymap.set("n", "<leader>tv", ":ToggleTerm direction=vertical<CR>", opts) -- toggle vertical terminal
-
--- Copy the :messages history to the system clipboard
-vim.api.nvim_create_user_command("MessagesYank", function()
-	local messages = vim.fn.execute("messages")
-	messages = messages:gsub("^%s*\n", ""):gsub("%s*$", "")
-	if messages == "" then
-		vim.notify("No messages to copy", vim.log.levels.WARN)
-		return
-	end
-	vim.fn.setreg("+", messages .. "\n")
-	local lines = select(2, messages:gsub("\n", "")) + 1
-	vim.notify(("Copied %d message line%s to the clipboard"):format(lines, lines == 1 and "" or "s"))
-end, { desc = "Copy :messages output to the system clipboard" })
-
-vim.keymap.set("n", "<leader>m", ":MessagesYank<CR>", opts) -- copy :messages to clipboard
