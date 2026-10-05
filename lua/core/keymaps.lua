@@ -36,6 +36,13 @@ vim.keymap.set("x", "p", "P", opts)
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
 vim.keymap.set("n", "<leader>Y", [["+Y]])
 
+-- Toggle comments with Neovim's built-in gc. <C-_> is what many terminals send for <C-/>.
+local comment_opts = { remap = true, silent = true }
+for _, lhs in ipairs({ "<C-_>", "<C-c>", "<C-/>" }) do
+	vim.keymap.set("n", lhs, "gcc", comment_opts)
+	vim.keymap.set("x", lhs, "gc", comment_opts)
+end
+
 -- Terminal buffer commands
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", opts) -- exit input mode in terminal buffer
 vim.keymap.set("n", "<leader>tf", ":ToggleTerm direction=float<CR>", opts) -- toggle floating terminal
