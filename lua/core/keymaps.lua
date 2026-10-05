@@ -14,7 +14,7 @@ vim.keymap.set("n", "x", '"_x', opts)
 -- Buffers
 vim.keymap.set("n", "<Tab>", ":bnext<CR>", opts)
 vim.keymap.set("n", "<S-Tab>", ":bprevious<CR>", opts)
-vim.keymap.set("n", "<leader>q", ":Bdelete!<CR>", opts) -- close buffer
+vim.keymap.set("n", "<leader>q", ":Bdelete<CR>", opts) -- close buffer
 vim.keymap.set("n", "<leader>n", "<cmd> enew <CR>", opts) -- new buffer
 
 -- Window management
