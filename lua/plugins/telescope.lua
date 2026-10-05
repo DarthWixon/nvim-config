@@ -1,7 +1,8 @@
 -- Fuzzy Finder (files, lsp, etc)
 return {
   'nvim-telescope/telescope.nvim',
-  branch = '0.1.x',
+  -- 0.2.x drops the old nvim-treesitter master API that 0.1.x's previewer needs
+  version = '0.2.*',
   dependencies = {
     'nvim-lua/plenary.nvim',
     -- Fuzzy Finder Algorithm which requires local dependencies to be built.
@@ -36,6 +37,11 @@ return {
             ['q'] = actions.close,
           },
         },
+        path_display = {
+          filename_first = {
+            reverse_directories = true,
+          },
+        },
       },
       pickers = {
         find_files = {
@@ -53,25 +59,20 @@ return {
             },
           },
         },
-      },
-      live_grep = {
-        file_ignore_patterns = { 'node_modules', '.git', '.venv' },
-        additional_args = function(_)
-          return { '--hidden' }
-        end,
-      },
-      path_display = {
-        filename_first = {
-          reverse_directories = true,
+        live_grep = {
+          file_ignore_patterns = { 'node_modules', '.git', '.venv' },
+          additional_args = function(_)
+            return { '--hidden' }
+          end,
+        },
+        git_files = {
+          previewer = false,
         },
       },
       extensions = {
         ['ui-select'] = {
           require('telescope.themes').get_dropdown(),
         },
-      },
-      git_files = {
-        previewer = false,
       },
     }
 
