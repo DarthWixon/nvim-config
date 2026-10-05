@@ -39,5 +39,13 @@ vim.o.cmdheight = 1 -- more space in the neovim command line for displaying mess
 vim.o.autoindent = true -- copy indent from current line when starting new one
 vim.opt.shortmess:append("c") -- don't give |ins-completion-menu| messages
 vim.opt.iskeyword:append("-") -- hyphenated words recognized by searches
-vim.opt.formatoptions:remove({ "c", "r", "o" }) -- don't insert the current comment leader automatically for auto-wrapping comments using 'textwidth', hitting <Enter> in insert mode, or hitting 'o' or 'O' in normal mode.
+-- Don't insert the comment leader automatically when wrapping with 'textwidth',
+-- pressing <Enter> in insert mode, or 'o'/'O' in normal mode. Filetype plugins
+-- reset formatoptions, so this has to run after them on every FileType.
+vim.api.nvim_create_autocmd("FileType", {
+	group = vim.api.nvim_create_augroup("NoCommentLeader", { clear = true }),
+	callback = function()
+		vim.opt_local.formatoptions:remove({ "c", "r", "o" })
+	end,
+})
 vim.opt.runtimepath:remove("/usr/share/vim/vimfiles") -- separate vim plugins from neovim in case vim still in use
