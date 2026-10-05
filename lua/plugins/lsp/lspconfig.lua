@@ -70,11 +70,11 @@ return {
 		-- Change the Diagnostic symbols in the sign column (gutter)
 		vim.diagnostic.config({
 			signs = {
-				values = {
-					{ name = "DiagnosticsSignError", text = " ", texthl = "DiagnosticsSignError" },
-					{ name = "DiagnosticsSignWarn", text = " ", texthl = "DiagnosticsSignWarn" },
-					{ name = "DiagnosticsSignInfo", text = "󰠠 ", texthl = "DiagnosticsSignInfo" },
-					{ name = "DiagnosticsSignHint", text = " ", texthl = "DiagnosticsSignHint" },
+				text = {
+					[vim.diagnostic.severity.ERROR] = " ",
+					[vim.diagnostic.severity.WARN] = " ",
+					[vim.diagnostic.severity.INFO] = "󰠠 ",
+					[vim.diagnostic.severity.HINT] = " ",
 				},
 			},
 		})
