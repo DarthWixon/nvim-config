@@ -21,7 +21,7 @@ return {
 				python = { "isort", "black" },
 			},
 			format_on_save = {
-				lsp_fallback = false,
+				lsp_format = "never",
 				async = false,
 				timeout_ms = 1500,
 			},
@@ -29,7 +29,7 @@ return {
 
 		vim.keymap.set({ "n", "v" }, "<leader>ff", function()
 			conform.format({
-				lsp_fallback = false,
+				lsp_format = "never",
 				async = false,
 				timeout_ms = 500,
 			})
