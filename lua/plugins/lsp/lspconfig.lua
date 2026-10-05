@@ -5,12 +5,8 @@ return {
 		"hrsh7th/nvim-cmp",
 		"hrsh7th/cmp-nvim-lsp",
 		{ "antosha417/nvim-lsp-file-operations", config = true },
-		{ "folke/neodev.nvim", opts = {} },
 	},
 	config = function()
-		-- import lspconfig plugin
-		local lspconfig = require("lspconfig")
-
 		-- import mason_lspconfig plugin
 		local mason_lspconfig = require("mason-lspconfig")
 
@@ -83,6 +79,43 @@ return {
 			},
 		})
 
+		-- mason-lspconfig v2 only enables servers; per-server settings live in
+		-- vim.lsp.config, which it picks up when it calls vim.lsp.enable.
+		vim.lsp.config("*", {
+			capabilities = capabilities,
+		})
+
+		vim.lsp.config("lua_ls", {
+			settings = {
+				Lua = {
+					runtime = {
+						version = "LuaJIT",
+					},
+					diagnostics = {
+						globals = { "vim" },
+					},
+					completion = {
+						callSnippet = "Replace",
+					},
+					-- Make the server aware of Neovim's runtime and its API type annotations
+					workspace = {
+						library = { vim.env.VIMRUNTIME },
+						checkThirdParty = false,
+					},
+				},
+			},
+		})
+
+		vim.lsp.config("pyright", {
+			settings = {
+				python = {
+					analysis = {
+						typeCheckingMode = "basic", -- or "strict" depending on preference
+					},
+				},
+			},
+		})
+
 		mason_lspconfig.setup({
 			-- Ensure mason installs the servers you need
 			ensure_installed = { "lua_ls", "pyright" },
@@ -90,61 +123,6 @@ return {
 			-- stylua is installed only as a formatter for conform; Mason's
 			-- build predates its --lsp mode, so starting it as a server fails.
 			automatic_enable = { exclude = { "stylua" } },
-
-			handlers = {
-				-- Default handler for servers not explicitly listed
-				-- This will apply to any server installed by mason that doesn't have a specific handler below
-				["_"] = function(server_name)
-					lspconfig[server_name].setup({
-						capabilities = capabilities,
-					})
-				end,
-
-				-- Specific configuration for lua_ls
-				["lua_ls"] = function()
-					lspconfig["lua_ls"].setup({
-						capabilities = capabilities,
-						settings = {
-							Lua = {
-								-- make the language server recognize "vim" global
-								diagnostics = {
-									globals = { "vim" },
-								},
-								completion = {
-									callSnippet = "Replace",
-								},
-								-- Add runtime path for Neovim's Lua files
-								-- This helps lua_ls find standard Neovim functions
-								runtime = {
-									version = "LuaJIT",
-									path = vim.split(package.path, ";"),
-								},
-								workspace = {
-									-- Make the server aware of Neovim runtime files
-									library = {
-										[vim.fn.expand("$VIMRUNTIME/lua")] = true,
-										[vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
-									},
-								},
-							},
-						},
-					})
-				end,
-
-				-- Specific configuration for pyright
-				["pyright"] = function()
-					lspconfig["pyright"].setup({
-						capabilities = capabilities,
-						settings = {
-							python = {
-								analysis = {
-									typeCheckingMode = "basic", -- or "strict" depending on preference
-								},
-							},
-						},
-					})
-				end,
-			},
 		})
 	end,
 }
