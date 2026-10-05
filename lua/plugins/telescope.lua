@@ -25,7 +25,7 @@ return {
     local actions = require 'telescope.actions'
     local builtin = require 'telescope.builtin'
 
-    require('telescope').setup {
+    telescope.setup {
       defaults = {
         mappings = {
           i = {
@@ -77,8 +77,8 @@ return {
     }
 
     -- Enable telescope fzf native, if installed
-    pcall(require('telescope').load_extension, 'fzf')
-    pcall(require('telescope').load_extension, 'ui-select')
+    pcall(telescope.load_extension, 'fzf')
+    pcall(telescope.load_extension, 'ui-select')
 
     vim.keymap.set('n', '<leader>?', builtin.oldfiles, { desc = '[?] Find recently opened files' })
     vim.keymap.set('n', '<leader>sb', builtin.buffers, { desc = '[S]earch existing [B]uffers' })

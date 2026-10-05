@@ -34,7 +34,6 @@ vim.o.showtabline = 2 -- always show tabs
 vim.o.backspace = "indent,eol,start" -- allow backspace on
 vim.o.pumheight = 10 -- pop up menu height
 vim.o.conceallevel = 0 -- so that `` is visible in markdown files
-vim.o.fileencoding = "utf-8" -- the encoding written to a file
 vim.o.cmdheight = 1 -- more space in the neovim command line for displaying messages
 vim.o.autoindent = true -- copy indent from current line when starting new one
 vim.opt.shortmess:append("c") -- don't give |ins-completion-menu| messages
@@ -48,4 +47,3 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.opt_local.formatoptions:remove({ "c", "r", "o" })
 	end,
 })
-vim.opt.runtimepath:remove("/usr/share/vim/vimfiles") -- separate vim plugins from neovim in case vim still in use
