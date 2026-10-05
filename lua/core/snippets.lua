@@ -13,10 +13,6 @@ vim.diagnostic.config({
 	float = {
 		source = "always", -- Or "if_many"
 	},
-	-- Make diagnostic background transparent
-	on_ready = function()
-		vim.cmd("highlight DiagnosticVirtualText guibg=NONE")
-	end,
 })
 
 -- Highlight on yank
