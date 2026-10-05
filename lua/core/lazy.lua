@@ -24,4 +24,6 @@ require("lazy").setup({
   },
   -- check for plugin updates once a day, quietly (see :Lazy for pending updates)
   checker = { enabled = true, notify = false, frequency = 86400 },
+  -- no plugin here needs luarocks; disabling it silences the health check error
+  rocks = { enabled = false },
 })
