@@ -87,6 +87,10 @@ return {
 			-- Ensure mason installs the servers you need
 			ensure_installed = { "lua_ls", "pyright" },
 
+			-- stylua is installed only as a formatter for conform; Mason's
+			-- build predates its --lsp mode, so starting it as a server fails.
+			automatic_enable = { exclude = { "stylua" } },
+
 			handlers = {
 				-- Default handler for servers not explicitly listed
 				-- This will apply to any server installed by mason that doesn't have a specific handler below
