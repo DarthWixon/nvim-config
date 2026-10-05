@@ -29,8 +29,8 @@ vim.keymap.set("n", "<C-j>", ":wincmd j<CR>", opts)
 vim.keymap.set("n", "<C-h>", ":wincmd h<CR>", opts)
 vim.keymap.set("n", "<C-l>", ":wincmd l<CR>", opts)
 
--- Keep last yanked when pasting
-vim.keymap.set("v", "p", '"_dP', opts)
+-- Visual P replaces the selection without overwriting the register
+vim.keymap.set("x", "p", "P", opts)
 
 -- Explicitly yank to system clipboard (highlighted and entire row)
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
